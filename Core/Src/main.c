@@ -1,4 +1,4 @@
-/* USER CODE BEGIN Header */
+ /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Com_debug.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,6 +89,10 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // 使用串口输出 => 打印一次hello world需要多长时间 => 1ms时间 根据波特率115200bit/s
+  // HAL_UART_Transmit(&huart1, "Hello World", 11, 1000);
+  // printf("hello world");
+  debug_printf("hello world");
   /* USER CODE END 2 */
 
   /* Infinite loop */
