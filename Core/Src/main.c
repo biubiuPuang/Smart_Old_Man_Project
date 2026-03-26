@@ -1,4 +1,4 @@
- /* USER CODE BEGIN Header */
+/* USER CODE BEGIN Header */
 /**
   ******************************************************************************
   * @file           : main.c
@@ -18,12 +18,17 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Com_debug.h"
+#include "Int_led.h"
+#include "Int_buzzer.h"
+#include "Int_step.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -87,18 +92,49 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART1_UART_Init();
+  MX_TIM3_Init();
+  MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
   // 使用串口输出 => 打印一次hello world需要多长时间 => 1ms时间 根据波特率115200bit/s
   // HAL_UART_Transmit(&huart1, "Hello World", 11, 1000);
   // printf("hello world");
-  debug_printf("hello world");
+  debug_printf("hello world %d",10);
+  
+  // 测试全彩灯
+  Int_led_send_data(LED_BLUE);
+
+  // 测试全彩灯 闪烁
+  // for (int8_t i = 0; i < 10; i++)
+  // {
+  //   Int_led_blink(LED_RED, 300);
+  // }
+
+  //测试全彩灯 彩虹灯效果
+  // for (uint8_t i = 0; i < 5; i++)
+  // {
+  //   // ms * 88 是一轮的时间
+  //   Int_led_rainbow(15);
+  // }
+
+  // 测试蜂鸣器
+  // Int_buzzer_on();
+  // HAL_Delay(2000);
+  // Int_buzzer_off();
+  // Int_buzzer_music();
+
+  // 测试i2c连接DS3553芯片
+  Int_step_init();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+    uint32_t count = Int_step_get_count();
+    debug_printf("count: %d\r\n", count);
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
