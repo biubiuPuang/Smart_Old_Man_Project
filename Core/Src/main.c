@@ -29,6 +29,7 @@
 #include "Int_led.h"
 #include "Int_buzzer.h"
 #include "Int_step.h"
+#include "Int_AT6558R.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,6 +95,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_TIM3_Init();
   MX_I2C1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // 使用串口输出 => 打印一次hello world需要多长时间 => 1ms时间 根据波特率115200bit/s
@@ -124,7 +126,11 @@ int main(void)
   // Int_buzzer_music();
 
   // 测试i2c连接DS3553芯片
-  Int_step_init();
+  // Int_step_init();
+
+
+  // 测试GPS
+  Int_GPS_Init();
 
   /* USER CODE END 2 */
 
@@ -132,8 +138,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    uint32_t count = Int_step_get_count();
-    debug_printf("count: %d\r\n", count);
+    // uint32_t count = Int_step_get_count();
+    // debug_printf("count: %d\r\n", count);
+    Int_GPS_Updata_Data();
     HAL_Delay(1000);
     /* USER CODE END WHILE */
 

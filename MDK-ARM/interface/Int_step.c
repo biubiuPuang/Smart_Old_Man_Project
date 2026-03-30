@@ -40,8 +40,9 @@ uint32_t Int_step_get_count(void)
     HAL_GPIO_WritePin(DS3553_CS_GPIO_Port, DS3553_CS_Pin, GPIO_PIN_RESET);
     HAL_Delay(5);
     HAL_I2C_Mem_Read(&hi2c1, DS3553_I2C_ADDR_R, DS3553_CNT_L, I2C_MEMADD_SIZE_8BIT, step_count, 3, 1000);
-    HAL_GPIO_WritePin(DS3553_CS_GPIO_Port, DS3553_CS_Pin, GPIO_PIN_SET);
+    
     HAL_Delay(10);
+    HAL_GPIO_WritePin(DS3553_CS_GPIO_Port, DS3553_CS_Pin, GPIO_PIN_SET);
 
     return (step_count[0] | step_count[1] << 8 | step_count[2] << 16);
 }

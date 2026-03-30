@@ -27,6 +27,7 @@
 "p01_location_hal\int_led.o"
 "p01_location_hal\int_buzzer.o"
 "p01_location_hal\int_step.o"
+"p01_location_hal\int_at6558r.o"
 --library_type=microlib --strict --scatter "P01_location_hal\P01_location_hal.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
