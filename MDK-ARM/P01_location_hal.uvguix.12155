@@ -6,7 +6,7 @@
   <Header>### uVision Project, (C) Keil Software</Header>
 
   <PrjGuiSettings>
-    <LastAddFilePath></LastAddFilePath>
+    <LastAddFilePath>C:\Users\12155\Pictures\Embedded-Software-Engineer\Project\SGG-Prevention of falls for the elderly\Project\V1\P01_location_hal\MDK-ARM</LastAddFilePath>
   </PrjGuiSettings>
 
   <ViewPool/>
@@ -1865,9 +1865,9 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>../Core/Src/main.c</Name>
-        <ColumnNumber>18</ColumnNumber>
+        <ColumnNumber>16</ColumnNumber>
         <TopLine>1</TopLine>
-        <CurrentLine>23</CurrentLine>
+        <CurrentLine>21</CurrentLine>
         <Folding>1</Folding>
         <ContractedFolders></ContractedFolders>
         <PaneID>0</PaneID>

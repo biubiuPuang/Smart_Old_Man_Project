@@ -687,6 +687,16 @@
               <FileType>5</FileType>
               <FilePath>.\common\Com_debug.h</FilePath>
             </File>
+            <File>
+              <FileName>Com_Filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\common\Com_Filter.c</FilePath>
+            </File>
+            <File>
+              <FileName>Com_Filter.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\common\Com_Filter.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -731,6 +741,16 @@
               <FileName>Int_AT6558R.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\interface\Int_AT6558R.h</FilePath>
+            </File>
+            <File>
+              <FileName>Int_mpu6050.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\interface\Int_mpu6050.c</FilePath>
+            </File>
+            <File>
+              <FileName>Int_mpu6050.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\interface\Int_mpu6050.h</FilePath>
             </File>
           </Files>
         </Group>
