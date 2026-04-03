@@ -44,3 +44,4 @@ p01_location_hal\main.o: ./interface/Int_AT6558R.h
 p01_location_hal\main.o: D:\Keil5\Core\ARM\ARM_Compiler_5.06u7\Bin\..\include\stdlib.h
 p01_location_hal\main.o: ./interface/Int_mpu6050.h
 p01_location_hal\main.o: ./common/Com_Filter.h
+p01_location_hal\main.o: ./interface/Int_qs100.h

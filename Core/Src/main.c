@@ -31,6 +31,7 @@
 #include "Int_step.h"
 #include "Int_AT6558R.h"
 #include "Int_mpu6050.h"
+#include "Int_qs100.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +99,7 @@ int main(void)
   MX_TIM3_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // 使用串口输出 => 打印一次hello world需要多长时间 => 1ms时间 根据波特率115200bit/s
@@ -134,7 +136,12 @@ int main(void)
   // Int_GPS_Init();
 
   // 测试陀螺仪
-  Int_mpu6050_init();
+  // Int_mpu6050_init();
+
+  // 测试IOT
+  Int_qs100_init();
+  Int_qs100_send_msg((uint8_t *)"hello world", 11);
+  HAL_Delay(1000);
 
   /* USER CODE END 2 */
 
@@ -147,11 +154,10 @@ int main(void)
     // Int_GPS_Updata_Data();
     // Int_mpu6050_init();
 
-    Int_mpu6050_get_accel_with_filter(&accel);
-    Int_mpu6050_get_gyro_with_filter(&gyro);
+    // Int_mpu6050_get_accel_with_filter(&accel);
+    // Int_mpu6050_get_gyro_with_filter(&gyro);
     // debug_printf("accel: %f, %f, %f", accel.accel_x, accel.accel_y, accel.accel_z);
-    debug_printf("gyro: %f.4, %f.4, %f.4", gyro.gyro_x, gyro.gyro_y, gyro.gyro_z);
-    HAL_Delay(10);
+    // debug_printf("gyro: %f.4, %f.4, %f.4", gyro.gyro_x, gyro.gyro_y, gyro.gyro_z);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
