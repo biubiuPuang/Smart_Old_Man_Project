@@ -26,10 +26,12 @@ p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_i2c.h
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
+p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 p01_location_hal\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 p01_location_hal\main.o: ../Core/Inc/i2c.h
+p01_location_hal\main.o: ../Core/Inc/spi.h
 p01_location_hal\main.o: ../Core/Inc/tim.h
 p01_location_hal\main.o: ../Core/Inc/usart.h
 p01_location_hal\main.o: ../Core/Inc/gpio.h
@@ -45,3 +47,6 @@ p01_location_hal\main.o: D:\Keil5\Core\ARM\ARM_Compiler_5.06u7\Bin\..\include\st
 p01_location_hal\main.o: ./interface/Int_mpu6050.h
 p01_location_hal\main.o: ./common/Com_Filter.h
 p01_location_hal\main.o: ./interface/Int_qs100.h
+p01_location_hal\main.o: ./interface/lora/Int_llcc68.h
+p01_location_hal\main.o: ./interface/lora/driver_llcc68.h
+p01_location_hal\main.o: ./interface/lora/driver_llcc68_interface.h
