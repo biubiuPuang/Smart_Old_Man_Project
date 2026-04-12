@@ -73,9 +73,6 @@ void Error_Handler(void);
 #define LED_0_GPIO_Port GPIOA
 #define DS3553_CS_Pin GPIO_PIN_5
 #define DS3553_CS_GPIO_Port GPIOB
-#define MPU_INT_Pin GPIO_PIN_9
-#define MPU_INT_GPIO_Port GPIOB
-#define MPU_INT_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 

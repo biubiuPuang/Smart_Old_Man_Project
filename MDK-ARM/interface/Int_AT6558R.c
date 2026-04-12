@@ -9,6 +9,20 @@ uint16_t gps_full_buff_len = 0;
 uint8_t gps_line_buff[GPS_LINE_BUFFER_SIZE] = {0}; // 存储的当前一行的数据
 uint16_t gps_line_buff_len = 0;
 
+// 编写对应接收数据的中断回调函数
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+{
+    if (huart->Instance == USART2)
+    {
+        gps_full_buff_len = Size;
+        // Int_GPS_Updata_Data(); // 本身数据处理 不耗费太多时间的 => 写在中断里也行
+        // 处理完成数据之后 清空缓存
+        // memset(gps_full_buff, 0, GPS_FULL_BUFFER_SIZE);
+        // gps_full_buff_len = 0;
+        // HAL_UARTEx_ReceiveToIdle_IT(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE);
+    }
+}
+
 /**
  * @brief 初始化GPS定位模块
  *
@@ -16,6 +30,14 @@ uint16_t gps_line_buff_len = 0;
  */
 void Int_GPS_Init(void)
 {
+    memset(gps_full_buff, 0, GPS_FULL_BUFFER_SIZE);
+    gps_full_buff_len = 0;
+    // GPS芯片发送完当次的定位数据之后 会发送一个空闲帧数据 => 当做接收完整数据的标记
+    // 出现以下两种情况 代码会继续向下执行
+    // 1. 达到超时时间 或者 缓冲区接收满了 => GPs芯片没有正常工作 / 缓冲区太小
+    // 2. 接收到了空闲帧数据 => 接收完成
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE);
+    HAL_UARTEx_ReceiveToIdle_IT(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE);
 }
 
 static NMEA_Type GPS_Get_Type(char *buff)
@@ -71,7 +93,7 @@ uint8_t GPS_Check_Sum(char *line_buff)
     strncpy(check_sum_str, end_flag + 1, 2);
     // 字符串转换为数字
     uint8_t check_sum_num = strtol(check_sum_str, NULL, 16);
-    debug_printf("check_num:%02x,check_sum_num:%02x", check_sum, check_sum_num);
+    // debug_printf("check_num:%02x,check_sum_num:%02x", check_sum, check_sum_num);
     return check_sum == check_sum_num; // 相等返回1,不相当返回0
 }
 
@@ -92,7 +114,7 @@ static void GPS_Parse_RMC(uint8_t *line_buff)
     sscanf((char *)line_buff, "$GNRMC,%6c%*4c,%c,%lf,%c,%lf,%c,  %*f,%*f,%6c", time, &status, &latitude, &latitude_dir, &longitude, &longitude_dir, date);
 
     // 打印
-    debug_printf("date:%s,time:%s,status:%c,latitude:%lf,latitude_dir:%c,longitude:%lf,longitude_dir:%c", date, time, status, latitude, latitude_dir, longitude, longitude_dir);
+    // debug_printf("date:%s,time:%s,status:%c,latitude:%lf,latitude_dir:%c,longitude:%lf,longitude_dir:%c", date, time, status, latitude, latitude_dir, longitude, longitude_dir);
 
     if (status == 'A')
     {
@@ -124,8 +146,8 @@ static void GPS_Parse_RMC(uint8_t *line_buff)
         // 记录当前时间戳
         gps_data.timestamp = HAL_GetTick();
 
-        debug_printf("date:%s , time:%s , latitude:%f,lat_dir:%c,longitude:%f,long_dir:%c",
-                     gps_data.date, gps_data.time, gps_data.latitude, gps_data.lat_dir, gps_data.longitude, gps_data.long_dir);
+        // debug_printf("date:%s , time:%s , latitude:%f,lat_dir:%c,longitude:%f,long_dir:%c",
+                    //  gps_data.date, gps_data.time, gps_data.latitude, gps_data.lat_dir, gps_data.longitude, gps_data.long_dir);
     }
     else if (status == 'V')
     {
@@ -146,7 +168,7 @@ static void GPS_Parse_GGA(uint8_t *line_buff)
 
     sscanf((char *)line_buff, "$GNGGA,%*f,%*f,%*c,%*f,%*c,  %hhu,%hhu,%f", &fs, &numSv, &HDOP);
 
-    debug_printf("fs:%d,numSv:%d,HDOP:%f", fs, numSv, HDOP);
+    // debug_printf("fs:%d,numSv:%d,HDOP:%f", fs, numSv, HDOP);
 
     // 数据的保存
     if (fs != 0)
@@ -181,14 +203,13 @@ static void GPS_Parse_VTG(uint8_t *line_buff)
  */
 void Int_GPS_Updata_Data(void)
 {
-    memset(gps_full_buff, 0, GPS_FULL_BUFFER_SIZE);
-    gps_full_buff_len = 0;
-
-    // GPS芯片发送完当次的定位数据之后 会发送一个空闲帧数据 => 当做接收完整数据的标记
-    // 出现以下两种情况 代码会继续向下执行
-    // 1. 达到超时时间 或者 缓冲区接收满了 => GPs芯片没有正常工作 / 缓冲区太小
-    // 2. 接收到了空闲帧数据 => 接收完成
-    HAL_UARTEx_ReceiveToIdle(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE, &gps_full_buff_len, 1000);
+    // memset(gps_full_buff, 0, GPS_FULL_BUFFER_SIZE);
+    // gps_full_buff_len = 0;
+    // // GPS芯片发送完当次的定位数据之后 会发送一个空闲帧数据 => 当做接收完整数据的标记
+    // // 出现以下两种情况 代码会继续向下执行
+    // // 1. 达到超时时间 或者 缓冲区接收满了 => GPs芯片没有正常工作 / 缓冲区太小
+    // // 2. 接收到了空闲帧数据 => 接收完成
+    // HAL_UARTEx_ReceiveToIdle(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE, &gps_full_buff_len, 1000);
     if (gps_full_buff_len > 0)
     {
         // debug_printf("GPS数据:\n%s", gps_full_buff);
@@ -204,7 +225,7 @@ void Int_GPS_Updata_Data(void)
 
             if (start_p == NULL || end_p == NULL)
             {
-                debug_printf("GPS数据结束");
+                // debug_printf("GPS数据结束");
                 break;
             }
 

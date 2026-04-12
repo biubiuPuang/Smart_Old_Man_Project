@@ -25,7 +25,7 @@ void Int_step_init(void);
  *
  * @return uint32_t
  */
-uint32_t Int_step_et_count(void);
+uint32_t Int_step_get_count(void);
 
 #endif //__INT_STEP_H
 

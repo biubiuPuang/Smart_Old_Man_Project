@@ -1,7 +1,7 @@
 #include "Int_step.h"
 // 记步芯片的底层驱动编写
 
-uint8_t step_count[3] = {0};
+uint8_t step_count_buf[3] = {0};
 
 /**
  * @brief 初始化DS3553芯片 主要设置user_set寄存器
@@ -39,10 +39,10 @@ uint32_t Int_step_get_count(void)
     // 打开片选引脚
     HAL_GPIO_WritePin(DS3553_CS_GPIO_Port, DS3553_CS_Pin, GPIO_PIN_RESET);
     HAL_Delay(5);
-    HAL_I2C_Mem_Read(&hi2c1, DS3553_I2C_ADDR_R, DS3553_CNT_L, I2C_MEMADD_SIZE_8BIT, step_count, 3, 1000);
+    HAL_I2C_Mem_Read(&hi2c1, DS3553_I2C_ADDR_R, DS3553_CNT_L, I2C_MEMADD_SIZE_8BIT, step_count_buf, 3, 1000);
     
     HAL_Delay(10);
     HAL_GPIO_WritePin(DS3553_CS_GPIO_Port, DS3553_CS_Pin, GPIO_PIN_SET);
 
-    return (step_count[0] | step_count[1] << 8 | step_count[2] << 16);
+    return (step_count_buf[0] | step_count_buf[1] << 8 | step_count_buf[2] << 16);
 }

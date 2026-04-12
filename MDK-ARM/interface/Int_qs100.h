@@ -67,5 +67,21 @@ IOT_Status Int_qs100_send(uint8_t socket_num,uint8_t *data, uint8_t len);
  */
 IOT_Status Int_qs100_send_msg(uint8_t *msg, uint16_t len);
 
+/**
+ * @brief 关闭socket
+ *
+ * @param socket_num
+ * @return IOT_Status
+ */
+IOT_Status Int_qs100_close_socket(uint8_t socket_num);
+
+/**
+ * @brief 创建连接 一直保存当前连接可以继续使用
+ *
+ * @param socket_num 表示创建的socket编号
+ * @return IOT_Status 表示是否创建成功
+ */
+IOT_Status Int_qs100_create_connection(uint8_t *socket_num);
+
 #endif /* __INT_QS100_ */
 

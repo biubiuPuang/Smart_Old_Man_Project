@@ -8,7 +8,7 @@
 #include "string.h"
 
 // 日志输出打印的总开关=>方便替换到生成环境 关闭所有的日志打印
-#define DEBUG_ENABLE
+// #define DEBUG_ENABLE
 #ifdef DEBUG_ENABLE
 
 // 使用字符串分割函数去掉FILE中的目录名

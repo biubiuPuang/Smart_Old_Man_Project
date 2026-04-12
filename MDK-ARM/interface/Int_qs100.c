@@ -71,13 +71,13 @@ void Int_qs100_init(void)
     Int_qs100_send_cmd("AT+CGMR\r\n");
     debug_printf("%s", qs100_buff);
 
-    // 4.设置打开回显
-    Int_qs100_send_cmd("ATE1\r\n");
-    debug_printf("%s", qs100_buff);
+    // // 4.设置打开回显
+    // Int_qs100_send_cmd("ATE1\r\n");
+    // debug_printf("%s", qs100_buff);
 
-    // 5.测试回显效果
-    Int_qs100_send_cmd("AT+CGMR\r\n");
-    debug_printf("%s", qs100_buff);
+    // // 5.测试回显效果
+    // Int_qs100_send_cmd("AT+CGMR\r\n");
+    // debug_printf("%s", qs100_buff);
 }
 
 /**
@@ -165,7 +165,7 @@ IOT_Status Int_qs100_send(uint8_t socket_num, uint8_t *data, uint8_t len)
 
     sprintf((char *)cmd_buff, "AT+NSOSD=%d,%d,%s,0x200,%d\r\n", socket_num, len, data_hex_buff, QS100_SEQUENCE_ID);
     Int_qs100_send_cmd(cmd_buff);
-    debug_printf("%s", qs100_buff);
+    // debug_printf("%s", qs100_buff);
 
     // 通过发送AT+SEQUENCE=SOCKID,SEQID查询数据是否已经发送成功
     uint8_t status = '2';
@@ -175,15 +175,31 @@ IOT_Status Int_qs100_send(uint8_t socket_num, uint8_t *data, uint8_t len)
         sprintf((char *)cmd_buff, "AT+SEQUENCE=%d,%d\r\n", socket_num, QS100_SEQUENCE_ID);
         Int_qs100_send_cmd(cmd_buff);
         // status赋值 = 接收数据中的结果
-        for (uint8_t i = 0; i < qs100_buff_len; i++)
-        {
-            debug_printf("%d:%c", i, qs100_buff[i]);
-        }
+        // for (uint8_t i = 0; i < qs100_buff_len; i++)
+        // {
+        //     debug_printf("%d:%c", i, qs100_buff[i]);
+        // }
         // debug_printf("status:%s", qs100_buff);
         // uint8_t status_index = strlen((char *)qs100_buff) - 9;
         // debug_printf("status_index:%d", status_index);
-        status = qs100_buff[19];
-        debug_printf("status:%c", status);
+
+        // 如果出现NSOSTR 忽略当前一次的消息
+        if (strstr((char *)qs100_buff, "NSOSTR") == NULL)
+        {
+            if (strchr((char *)qs100_buff, '2') != NULL)
+            {
+                status = '2';
+            }
+            if (strchr((char *)qs100_buff, '1') != NULL)
+            {
+                status = '1';
+            }
+            if (strchr((char *)qs100_buff, '0') != NULL)
+            {
+                status = '0';
+            }
+            // debug_printf("status:%c", status);
+        }
 
         // 添加延迟
         HAL_Delay(10);
@@ -202,12 +218,12 @@ IOT_Status Int_qs100_send(uint8_t socket_num, uint8_t *data, uint8_t len)
  * @param socket_num
  * @return IOT_Status
  */
-IOT_Status Int_qs100_close_ocket(uint8_t socket_num)
+IOT_Status Int_qs100_close_socket(uint8_t socket_num)
 {
     memset(cmd_buff, 0, QS100_DATA_MAX_LEN);
-    sprintf((char *)cmd_buff, "AT+NSOCL=%d\r\n",socket_num);
+    sprintf((char *)cmd_buff, "AT+NSOCL=%d\r\n", socket_num);
     Int_qs100_send_cmd(cmd_buff);
-    debug_printf("%s",qs100_buff); 
+    debug_printf("%s", qs100_buff);
 
     if (strstr((char *)qs100_buff, "Ok") != NULL)
     {
@@ -249,7 +265,7 @@ IOT_Status Int_qs100_send_msg(uint8_t *msg, uint16_t len)
     //  4.发送数据
     uint8_t send_count = 0;
     IOT_Status status = IOT_ERROR;
-    while(Int_qs100_send(socket_num, msg, len) != IOT_OK && send_count  < 3)
+    while (Int_qs100_send(socket_num, msg, len) != IOT_OK && send_count < 3)
     {
         HAL_Delay(100);
         send_count++;
@@ -263,10 +279,43 @@ IOT_Status Int_qs100_send_msg(uint8_t *msg, uint16_t len)
     {
         // 发送成功
         status = IOT_OK;
-    } 
+    }
     // 5.关闭连接
-    Int_qs100_close_ocket(socket_num);
+    Int_qs100_close_socket(socket_num);
 
     return status;
+}
 
+/**
+ * @brief 创建连接 一直保存当前连接可以继续使用
+ *
+ * @param socket_num 表示创建的socket编号
+ * @return IOT_Status 表示是否创建成功
+ */
+IOT_Status Int_qs100_create_connection(uint8_t *socket_num)
+{
+    // 1.检查附着是否能够连接到外网
+    uint8_t count = 0;
+    while (Int_qs100_get_ip() != IOT_OK && count < QS100_MAX_RECV_COUNTS)
+    {
+        HAL_Delay(1000);
+        count++;
+    }
+    // 2.创建socket
+    while (Int_qs100_open_socket(socket_num) != IOT_OK && count < QS100_MAX_RECV_COUNTS)
+    {
+        HAL_Delay(100);
+        count++;
+    }
+    // 3.连接云服务器
+    while (Int_qs100_connect_server(*socket_num) != IOT_OK && count < QS100_MAX_RECV_COUNTS)
+    {
+        HAL_Delay(100);
+        count++;
+    }
+    if (count >= QS100_MAX_RECV_COUNTS)
+    {
+        return IOT_ERROR;
+    }
+    return IOT_OK;
 }

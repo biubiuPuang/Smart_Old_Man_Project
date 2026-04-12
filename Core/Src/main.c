@@ -27,19 +27,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Com_debug.h"
-#include "Int_led.h"
-#include "Int_buzzer.h"
-#include "Int_step.h"
-#include "Int_AT6558R.h"
-#include "Int_mpu6050.h"
-#include "Int_qs100.h"
-#include "Int_llcc68.h"
+#include "App_upload_data.h"
+#include "App_warning.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-MPU6050_Gyro gyro;
-MPU6050_Accel accel = {.accel_x = 0, .accel_y = 0, .accel_z = 16384};
+extern uint8_t gps_full_buff[GPS_FULL_BUFFER_SIZE]; // 存储的所有接收到的数据
+extern uint16_t gps_full_buff_len;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -104,79 +99,65 @@ int main(void)
   MX_USART3_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
-  // 使用串口输出 => 打印一次hello world需要多长时间 => 1ms时间 根据波特率115200bit/s
-  // HAL_UART_Transmit(&huart1, "Hello World", 11, 1000);
-  // printf("hello world");
   debug_printf("hello world %d", 10);
 
-  // 测试全彩灯
-  Int_led_send_data(LED_BLUE);
-
-  // 测试全彩灯 闪烁
-  // for (int8_t i = 0; i < 10; i++)
-  // {
-  //   Int_led_blink(LED_RED, 300);
-  // }
-
-  // 测试全彩灯 彩虹灯效果
-  //  for (uint8_t i = 0; i < 5; i++)
-  //  {
-  //    // ms * 88 是一轮的时间
-  //    Int_led_rainbow(15);
-  //  }
-
-  // 测试蜂鸣器
-  // Int_buzzer_on();
-  // HAL_Delay(2000);
-  // Int_buzzer_off();
-  // Int_buzzer_music();
-
-  // 测试i2c连接DS3553芯片
-  // Int_step_init();
-
-  // 测试GPS
-  // Int_GPS_Init();
-
-  // 测试陀螺仪
-  // Int_mpu6050_init();s
-
-  // 测试IOT
-  // Int_qs100_init();
-  // Int_qs100_send_msg((uint8_t *)"hello world", 11);
-  // HAL_Delay(1000);
-
-  // 测试lora
-  Int_llcc68_init();
-  uint8_t data[16] = {0};
-  uint16_t len = 0;
-
+  // 初始化上传相关硬件
+  App_Upload_Data_init();
+  // 初始化告警相关硬件
+  App_warning_Init();
+  uint32_t tick_count = HAL_GetTick();
+  uint8_t status = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // uint32_t count = Int_step_get_count();
-    // debug_printf("count: %d\r\n", count);
-    // Int_GPS_Updata_Data();
-    // Int_mpu6050_init();
 
-    // Int_mpu6050_get_accel_with_filter(&accel);
-    // Int_mpu6050_get_gyro_with_filter(&gyro);
-    // debug_printf("accel: %f, %f, %f", accel.accel_x, accel.accel_y, accel.accel_z);
-    // debug_printf("gyro: %f.4, %f.4, %f.4", gyro.gyro_x, gyro.gyro_y, gyro.gyro_z);
-
-    // Int_llcc68_send("hello",5);
-    Int_llcc68_receive(data, &len);
-    if (len > 0)
+    // 更新gps定位数据
+    if (gps_full_buff_len > 0)
     {
-      debug_printf("receive: %s", data);
-      memset(data, 0, len);
-      len = 0;
+      Int_GPS_Updata_Data();
+      gps_full_buff_len = 0;
+      memset(gps_full_buff, 0, GPS_FULL_BUFFER_SIZE);
+      HAL_UARTEx_ReceiveToIdle_IT(&huart2, gps_full_buff, GPS_FULL_BUFFER_SIZE);
     }
 
-    HAL_Delay(1000);
+    if (status == 1)
+    {
+      // // 两种写法都可以 => 稳定周期3s 包含代码运行的时间
+      // uint32_t current_tick = HAL_GetTick();
+      // if (current_tick - tick_count >= 3000)
+      // {
+      //   // 3s 上传一次
+      //   tick_count = current_tick;
+      // }
+      // 发出告警 闪灯 发送声音
+      App_Warning_run();
+
+      // 稳定发送完成之后等待3s 实际的周期大于3s
+      if (HAL_GetTick() - tick_count >= 3000)
+      {
+        // 3s 上传一次
+        App_upload_data(status);
+        tick_count = HAL_GetTick();
+      }
+    }
+    else
+    {
+      // 裸机开发 只能按照代码顺序执行 => 获取GPS信息时无法执行其他的事情
+      // 判断逻辑 => 高速运行
+      status = App_Warning_Get_status();
+
+      // 稳定发送完成之后等待5s 实际的周期大于5s
+      if (HAL_GetTick() - tick_count >= 3000)
+      {
+        // 5s 上传一次
+        App_upload_data(status);
+        tick_count = HAL_GetTick();
+      }
+    }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
